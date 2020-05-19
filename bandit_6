@@ -1,0 +1,4 @@
+cd inhere
+find . -type f -size 1033c ! -executable
+
+password DXjZPULLxYr17uwoI01bNLQbtFemEgo7

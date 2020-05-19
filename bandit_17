@@ -1,0 +1,3 @@
+cat /etc/bandit_pass/bandit16 | openssl s_client -connect localhost:31790 -quiet > /tmp/mera123/key.private
+chmod 600 key.private
+xLYVMN9WE5zQ5vHacb0sZEVqbrp7nBTn

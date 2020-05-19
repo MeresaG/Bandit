@@ -1,0 +1,50 @@
+From the list of command, xxd is to make a hexdump or do the reverse. Sounds like something we can use.  In additional, the file is repeatedly compressed and so we would need gzip and bzip2 as well. As mentioned in the Level Goal, this may take a few iteration and a temporary directory is recommended to do this.
+
+First we reverse the hexdump to binary. Use file, we can find out the format of the compression. Use man gzip, we find out the option to decompress is -d. Also, if we gzip -d data2 now, it will error out with unknown suffix. Therefore, we need to rename the file to .gz before decompress.
+
+xxd -r data.txt data2
+file data2
+data2: gzip compressed data, was "data2.bin", from Unix, last modified: Thu Jun 6 13:59:44 2013, max compression
+mv data2 data.gz
+gzip -d data.gz
+
+Now a new file data is in the folder. Use file again to see what type of file we are dealing with. The data file is a bzip2 compressed file. Again, from man bzip2, -d option is for decompress. It will complain about the original name and add a .out to the file name.
+
+file data
+data: bzip2 compressed data, block size = 900k
+bzip2 -d data
+bzip2: Can't guess original name for data -- using data.out
+
+Using file again to see that we once again have a gzip file. This time, lets use zcat so we don’t need to rename the file again. The next file is a tar archive. From the man tar page, -x option is for extract, -v for verbosely list files processed and -f for file archive. This will extract the file you specified and list any file that is being processed by this extraction. As shown, data5.bin is extracted.
+
+file data.out
+data.out: gzip compressed data, was "data4.bin", from Unix, last modified: Thu Jun 6 13:59:43 2013, max compression
+zcat data.out > data3
+file data3
+data3: POSIX tar archive (GNU)
+tar -xvf data3
+data5.bin
+
+data5.bin is again a tar archive and using the same command (with different file) we get data6.bin, which is a bzip2 file again. After that, another tar achive (data6.bin.out) and then another gzip file (data8.bin).
+
+file data5.bin
+data5.bin: POSIX tar archive (GNU)
+tar -xvf data5.bin
+data6.bin
+file data6.bin
+bzip2 -d data6.bin
+bzip2: Can't guess original name for data6.bin -- using data6.bin.out
+file data6.bin.out
+data6.bin.out: POSIX tar archive (GNU)
+tar -xvf data6.bin.out
+data8.bin
+file data8.bin
+data8.bin: gzip compressed data, was "data9.bin", from Unix, last modified: Thu Jun  6 13:59:43 2013, max compression
+zcat data8.bin > data9.bin
+
+And at last, after we decompress the gzip file, we have a ASCII text file (data9.bin).
+
+file data9.bin
+data9.bin: ASCII text
+cat data9.bin
+8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
